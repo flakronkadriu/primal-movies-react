@@ -1,0 +1,35 @@
+.movie-details > .poster > img {
+    float: left;
+    padding-right: 30px;
+}
+.movie-details > .poster > .title {
+    color: #fff;
+}
+.movie-details > .poster > .youtube-frame {
+    padding-top: 10px;
+}
+.movie-details > .poster > .title > span {
+    font-size: 24px;
+    font-weight: 300;
+    margin-left: 10px;
+}
+.movie-details > .overview{
+    padding: 10px;
+    margin-top: 20px;
+    color: #fff;
+    border: 1px solid #1e61cc;
+    border-radius: 15px;
+    word-wrap: break-word;
+}
+.movie-details > .genres{
+    color: #007bff;
+    margin-top: 20px;
+    font-size: 14px;
+    height: 40px;
+}
+.movie-details > .genres span:first-child{
+    padding-left: 0;
+}
+.movie-details > .genres span {
+    padding: 5px;
+}

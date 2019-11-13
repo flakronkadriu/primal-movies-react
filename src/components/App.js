@@ -1,36 +1,43 @@
 import React from 'react';
-import { Route, Redirect, BrowserRouter as Router } from 'react-router-dom'
+import { Route, Redirect, Switch, BrowserRouter as Router } from 'react-router-dom'
 import './App.css';
 import MoviesList from './moviesList/MoviesList';
 import NavMenu from './nav-menu/NavigationMenu';
 import MovieDetail from './moviesDetails/MoviesDetails';
+import { environment } from "../environments";
+import LoadingSpinner from "../htmlElements/LoadingSpinner";
 
 class App extends React.Component {
   constructor(props) {
     super(props);    
-    this.state = {
-      movieDbBaseUrl: "https://api.themoviedb.org/3",
+    this.state = {      
       error: null,
       isLoaded: false,
-      page: 1,
-      totalPages: 1,
-      movies: [],
-      movieGenres: []
+      pages: [],
+      activePage: null,      
+      totalPages: 1,    
+      movieGenres: [],      
     };
   }
 
-  getMovies = async pageNumber => {
-    // ADD THE MOVIEDB API KEY
-    await fetch(`${this.state.movieDbBaseUrl}/discover/movie?api_key=${API_KEY_HERE}&language=en-US&sort_by=popularity.desc&page=${pageNumber}`, {
+  getMoviesApi = async pageNumber => {
+    // ADD THE MOVIEDB API KEY  
+    const { pages } = this.state; 
+    await fetch(`${environment.movieDbBaseUrl}/discover/movie?api_key=${environment.MOVIE_DB_API_KEY}&language=en-US&sort_by=popularity.desc&page=${pageNumber}`, {
       method: 'GET'
     })
       .then(result => result.json())
-      .then(res => {
-        this.setState({
-          movies: res.results,
-          totalPages: res.total_pages,
-          page: res.page,
-          isLoaded: true
+      .then(res => {     
+        let page  = {
+          pageNumber: res.page,
+          movies: res.results
+        };
+        pages.push(page);
+        this.setState({          
+          totalPages: res.total_pages,          
+          isLoaded: true,
+          pages,
+          activePage: page
         });        
       }, (error) => {
         this.setState({
@@ -40,9 +47,23 @@ class App extends React.Component {
       })
   }
 
+  getMovies = pageNumber => {
+    const { totalPages, pages } = this.state;
+    if(pageNumber < 1 || pageNumber > totalPages && totalPages < 1){
+      return;
+    }
+    const searchResult = pages.find(f => f.pageNumber == pageNumber);
+    if(searchResult != undefined){
+      this.setState({activePage: searchResult});
+    }else{
+      this.setState({isLoaded: false});
+      this.getMoviesApi(pageNumber);
+    }
+  }
+
   getGenres = async () => {
     // ADD THE MOVIEDB API KEY
-    await fetch(`${this.state.movieDbBaseUrl}/genre/movie/list?api_key=${API_KEY_HERE}&language=en-US`)
+    await fetch(`${environment.movieDbBaseUrl}/genre/movie/list?api_key=${environment.MOVIE_DB_API_KEY}&language=en-US`)
       .then(result => result.json())
       .then(res => {
         this.setState({
@@ -51,32 +72,29 @@ class App extends React.Component {
       });
   }
 
-  componentDidMount() {
-    this.getGenres();
-    this.getMovies(1);
+  componentWillMount(){
+    if(this.state.movieGenres.length == 0){
+      this.getGenres();
+      this.getMovies(1);
+    }
   }
 
   render() {
-    const { movies, movieGenres, totalPages, page, isLoaded, error } = this.state;
+    const { activePage, movieGenres, totalPages, isLoaded } = this.state;
     return (
       <Router>
         <div className="App">
           <NavMenu />
           <div className="container mt-5">
-            <Route exact path="/" render={() => (
-              <Redirect to="/movies" />
-            )} />
-            <Route exact path="/movies" 
-            render={props => 
-            <MoviesList {...props} 
-            getMovies={this.getMovies} 
-            movies={movies} 
-            totalPages={totalPages}
-            page={page}
-            isLoaded={isLoaded}
-            error= {error} 
-            genres={movieGenres} />} />
-            <Route exact path="/movies/:id" component={MovieDetail} />
+            <Switch>
+              <Route exact path="/">
+                <Redirect to="/movies" />
+              </Route>
+              <Route exact path="/movies">
+                { isLoaded && activePage !== null ? <MoviesList page={activePage} totalPages={totalPages} genres={movieGenres} getMovies={this.getMovies} /> : <LoadingSpinner /> }              
+              </Route>
+              <Route exact path="/movies/:id" component={MovieDetail} />
+            </Switch>            
           </div>
         </div>
       </Router>

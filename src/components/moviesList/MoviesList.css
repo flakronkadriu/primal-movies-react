@@ -46,3 +46,7 @@ a:hover{
     padding: 10px;
     margin: 10px 5px;
 }
+.extend {
+    margin: 0 5px;
+    color: #ffff;
+}

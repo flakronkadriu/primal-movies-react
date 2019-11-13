@@ -1,5 +1,7 @@
 import React from 'react';
 import './MoviesDetails.css';
+import { environment } from "../../environments";
+import LoadingSpinner from "../../htmlElements/LoadingSpinner";
 
 class MovieDetail extends React.Component {
 
@@ -13,10 +15,11 @@ class MovieDetail extends React.Component {
         }
     }
     getMovieDetails = async () => {
-        await fetch(`https://api.themoviedb.org/3/movie/${this.props.match.params.id}?api_key=${API_KEY_HERE}&language=en-US`, { method: 'GET' })
+        const { id } = this.props.match.params;
+        await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${environment.MOVIE_DB_API_KEY}&language=en-US`, { method: 'GET' })
             .then(result => result.json())
             .then(res => {
-                this.setState({
+                this.setState({                    
                     item: res
                 })
                 this.getYoutubeVideoId();
@@ -25,25 +28,28 @@ class MovieDetail extends React.Component {
 
     getYoutubeVideoId = async () => {
         //ADD YOUTUBE API KEY
-        let youtubeSearchEndpoint = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY_HERE}&maxResults=10&part=snippet`;
-        let searchQuery = `${youtubeSearchEndpoint}&q=${this.state.item.title} official trailer`;
+        let { title } = this.state.item;
+        let youtubeSearchEndpoint = `https://www.googleapis.com/youtube/v3/search?key=${environment.YOUTUBE_API_KEY}&maxResults=10&part=snippet`;
+        let searchQuery = `${youtubeSearchEndpoint}&q=${title} official trailer`;
         await fetch(searchQuery)
             .then(result => result.json())
             .then(res => {
                 this.setState({
-                    isLoading: false,
+                    isLoading: false,                    
                     youtubeVideoId: res.items[0].id.videoId
                 });
             });
     }
 
-    componentDidMount() {
-        this.getMovieDetails();
+    componentWillMount() {        
+        if(this.state.item == null){
+            this.getMovieDetails();
+        }        
     }
     render() {        
         let { item, isLoading } = this.state;
         if (isLoading) {
-            return <div>Loading...</div>
+            return <LoadingSpinner />
         } else {
             return (
                 <div className="container movie-details">
@@ -60,7 +66,7 @@ class MovieDetail extends React.Component {
                     <div className="genres">
                         {
                             item.genres.map((genre) => 
-                                <span>{genre.name}</span>
+                                <span key={genre.id}>{genre.name}</span>
                             )
                         }
                     </div>

@@ -37,7 +37,7 @@ function MoviesList(props) {
         }  
         return pageNumbers;
     }
-
+    
     return (
         <div className="container">            
             <div className="row">

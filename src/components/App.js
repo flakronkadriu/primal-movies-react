@@ -6,6 +6,7 @@ import NavMenu from './nav-menu/NavigationMenu';
 import MovieDetail from './moviesDetails/MoviesDetails';
 import { environment } from "../environments";
 import LoadingSpinner from "../htmlElements/LoadingSpinner";
+import SearchMovie from './searchMovie/SearchMovie';
 
 class App extends React.Component {
   constructor(props) {
@@ -49,7 +50,7 @@ class App extends React.Component {
 
   getMovies = pageNumber => {
     const { totalPages, pages } = this.state;
-    if(pageNumber < 1 || pageNumber > totalPages && totalPages < 1){
+    if((pageNumber < 1 || pageNumber > totalPages) && totalPages < 1){
       return;
     }
     const searchResult = pages.find(f => f.pageNumber == pageNumber);
@@ -94,6 +95,7 @@ class App extends React.Component {
                 { isLoaded && activePage !== null ? <MoviesList page={activePage} totalPages={totalPages} genres={movieGenres} getMovies={this.getMovies} /> : <LoadingSpinner /> }              
               </Route>
               <Route exact path="/movies/:id" component={MovieDetail} />
+              <Route exact path="/search" render={props => <SearchMovie {...props} genres={movieGenres} />} />
             </Switch>            
           </div>
         </div>

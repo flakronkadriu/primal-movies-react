@@ -85,18 +85,20 @@ class App extends React.Component {
     return (
       <Router>
         <div className="App">
-          <NavMenu />
+          <NavMenu getMovies={this.getMovies} />
           <div className="container mt-5">
             <Switch>
               <Route exact path="/">
                 <Redirect to="/movies" />
               </Route>
-              <Route exact path="/movies">
-                { isLoaded && activePage !== null ? <MoviesList page={activePage} totalPages={totalPages} genres={movieGenres} getMovies={this.getMovies} /> : <LoadingSpinner /> }              
-              </Route>
-              <Route exact path="/movies/:id" component={MovieDetail} />
-              <Route exact path="/search" render={props => <SearchMovie {...props} genres={movieGenres} />} />
-            </Switch>            
+              <Route exact path="/movies/:id" component={MovieDetail} />                                
+              <Route exact path="/movies" render={props => 
+                isLoaded && activePage !== null ?
+                  <MoviesList {...props} page={activePage} totalPages={totalPages} genres={movieGenres} getMovies={this.getMovies} />
+                  : <LoadingSpinner />
+              } />
+              <Route path="/search" render={props => <SearchMovie {...props} genres={movieGenres} />} />            
+            </Switch>
           </div>
         </div>
       </Router>

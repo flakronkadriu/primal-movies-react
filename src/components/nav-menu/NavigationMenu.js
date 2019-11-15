@@ -12,14 +12,13 @@ class NavMenu extends React.Component {
         super(props);
 
         this.state = {
-            searchValue: "",
-            formSubmitted: false
+            searchValue: ""            
         };
     }
 
     handleSearchInput = event => {
         this.setState({searchValue: event.target.value });
-    };
+    }
 
     handleSubmitSearch = (event) => {
         let { searchValue } = this.state;
@@ -28,7 +27,16 @@ class NavMenu extends React.Component {
             this.props.history.push(searchQuery);
         }
         event.preventDefault();
-    };
+    }
+
+    handleHomePageClick = (event) => {     
+        if(this.props.location.pathname === "/movies"){
+            this.props.getMovies(1);
+        }else{
+            this.props.history.push("/movies");
+        }
+        event.preventDefault();
+    }
 
     destructSearchParams = (paramsString) => {
         const params = new URLSearchParams(paramsString); 
@@ -53,14 +61,14 @@ class NavMenu extends React.Component {
         return (
             <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div className="container">
-                    <NavLink exact={true} className="navbar-brand" to="/" activeClassName="active">Primal Movies</NavLink>
+                    <NavLink className="navbar-brand" to="#" onClick={this.handleHomePageClick} activeClassName="active">Primal Movies</NavLink>
                     <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>
                     <div className="collapse navbar-collapse" id="navbarNavDropdown">
                         <ul className="navbar-nav ml-auto">
                             <li className="nav-item">
-                                <NavLink className="nav-link" to="/" activeClassName="active">Home</NavLink>
+                                <NavLink className="nav-link" to="#" onClick={this.handleHomePageClick} activeClassName="active">Home</NavLink>
                             </li>
                         </ul>
                         <form onSubmit={this.handleSubmitSearch} className="form-inline my-2 my-lg-0">

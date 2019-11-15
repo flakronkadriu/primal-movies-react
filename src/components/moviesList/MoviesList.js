@@ -36,14 +36,13 @@ function MoviesList(props) {
             pageNumbers.push(<button key="next" className="btn btn-secondary mb-2" onClick={() => props.getMovies(pageNumber + 1)}>&rarr;</button>)
         }  
         return pageNumbers;
-    }
-    
+    }    
     return (
         <div className="container">            
             <div className="row">
                 {movies.map(item => (
                     <div key={item.id} className="col-md-3 portfolio-item">
-                        <Link to={"/movies/" + item.id}>
+                        <Link to={`${props.location.pathname}/${item.id}`}>
                             <img className="img-responsive" src={"http://image.tmdb.org/t/p/w300/" + item.poster_path} alt="" />
                             <div className="title">
                                 {item.title}

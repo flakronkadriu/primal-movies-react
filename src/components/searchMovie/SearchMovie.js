@@ -1,7 +1,9 @@
 import React from 'react';
 import LoadingSpinner from '../../htmlElements/LoadingSpinner';
+import { Route, Switch, BrowserRouter as Router } from 'react-router-dom'
 import { environment } from "../../environments";
 import MoviesList from '../moviesList/MoviesList';
+import MovieDetail from '../moviesDetails/MoviesDetails';
 
 class SearchMovie extends React.Component {
     
@@ -47,7 +49,7 @@ class SearchMovie extends React.Component {
         this.setState({searchText: querySearch}, () => this.searchMovieApi(1));
     }
 
-    componentWillMount(){
+    componentWillMount(){         
         if(this.state.searchText == ""){
             let paramsString = this.props.location.search;
             if(paramsString !== ""){
@@ -58,19 +60,28 @@ class SearchMovie extends React.Component {
 
     componentWillReceiveProps(nextProps){
         if(nextProps.location != this.props.location){
-            let paramsString = nextProps.location.search;
-            if(paramsString !== ""){
-                this.destructSearchParams(paramsString);
+            let nextParamsString = nextProps.location.search;
+            let currentParamsString = this.props.location.search;
+            if(nextParamsString !== "" && nextParamsString != currentParamsString){
+                this.destructSearchParams(nextParamsString);
             }
         }
     }
 
     render(){
-        const { isLoaded, activePage, totalPages } = this.state;
-        if(!isLoaded && activePage == null){
-            return <LoadingSpinner />;
-        }
-        return <MoviesList page={activePage} totalPages={totalPages} genres={this.props.genres} getMovies={this.searchMovieApi} />;
+        const { isLoaded, activePage, totalPages } = this.state;        
+        return (
+            <Router>
+                <Switch>
+                    <Route exact path="/search/:id" component={MovieDetail} />
+                    <Route exact path="/search" render={props =>
+                    isLoaded && activePage !== null ?
+                    <MoviesList {...props} page={activePage} totalPages={totalPages} genres={this.props.genres} getMovies={this.searchMovieApi} />
+                    : <LoadingSpinner />
+                    } />
+                </Switch>        
+            </Router>
+        );
     }
 
 

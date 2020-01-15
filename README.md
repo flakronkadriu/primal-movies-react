@@ -7,6 +7,10 @@ Youtube API is used for getting youtube videos.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Demo
+
+[Primal Movies React Demo](https://master.dd8br5ubs1c7r.amplifyapp.com)
+
 ### `yarn install`
 Run this command before `yarn start` to install required packages.
 ### `yarn start`

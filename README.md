@@ -9,7 +9,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Demo
 
-[Primal Movies React Demo](https://master.dd8br5ubs1c7r.amplifyapp.com)
+[Primal Movies React Demo](https://primal-movies-react.netlify.app)
 
 ## 
 ### `yarn install`

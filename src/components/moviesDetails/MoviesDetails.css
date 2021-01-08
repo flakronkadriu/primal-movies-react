@@ -1,35 +1,37 @@
-.movie-details > .poster > img {
-    float: left;
+.poster{
+    display: flex;
+    flex-direction: row;
+}
+.poster > img {
     padding-right: 30px;
 }
-.movie-details > .poster > .title {
+.movie-details {
+    margin-left: 30px;
+}
+.title {
     color: #fff;
 }
-.movie-details > .poster > .youtube-frame {
+.youtube-frame {
     padding-top: 10px;
 }
-.movie-details > .poster > .title > span {
-    font-size: 24px;
-    font-weight: 300;
-    margin-left: 10px;
-}
-.movie-details > .overview{
+.overview-details{
     padding: 10px;
     margin-top: 20px;
     color: #fff;
     border: 1px solid #1e61cc;
     border-radius: 15px;
     word-wrap: break-word;
+    height: 100%;
 }
-.movie-details > .genres{
+.genres{
     color: #007bff;
     margin-top: 20px;
     font-size: 14px;
     height: 40px;
 }
-.movie-details > .genres span:first-child{
+.genres span:first-child{
     padding-left: 0;
 }
-.movie-details > .genres span {
+.genres span {
     padding: 5px;
 }

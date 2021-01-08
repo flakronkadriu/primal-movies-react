@@ -7,8 +7,16 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'jquery/src/jquery';
 import 'bootstrap/dist/js/bootstrap.min';
 import 'popper.js/dist/popper';
+import { createBrowserHistory } from 'history';
+import { BrowserRouter as Router } from 'react-router-dom'
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const history = createBrowserHistory();
+
+ReactDOM.render(
+    <Router history={history}>
+        <App />
+    </Router>,
+    document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

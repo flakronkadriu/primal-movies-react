@@ -1,88 +1,79 @@
 import React from 'react';
 import LoadingSpinner from '../../htmlElements/LoadingSpinner';
-import { Route, Switch, BrowserRouter as Router } from 'react-router-dom'
-import { environment } from "../../environments";
+import { Route, Switch, Redirect } from 'react-router-dom'
 import MoviesList from '../moviesList/MoviesList';
-import MovieDetail from '../moviesDetails/MoviesDetails';
+import MovieDetails from '../moviesDetails/MoviesDetails';
+import * as MovieDbApi from '../../services/api-calls';
 
-class SearchMovie extends React.Component {
-    
-    constructor(props){
-        super(props);
+const SearchMovie = (props) => {
+    const [searchMovieState, setSearchMovieState] = React.useState({});
 
-        this.state={
-            pages: [],
-            isLoaded: false,
-            activePage: null,      
-            totalPages: 1,
-            searchText: ""
-        };
-    }
+    React.useEffect(() => {
+        let paramsString = props.location.search;
+        if (paramsString !== "") {
+            destructSearchParams(paramsString);
+        }
+    }, [props.location]);
 
-    searchMovieApi = async (pageNumber) => {
-        const { pages } = this.state;
-        await fetch(`${environment.movieDbBaseUrl}/search/movie?api_key=${environment.MOVIE_DB_API_KEY}&language=en-US&page=${pageNumber}&query=${this.state.searchText}`)
-              .then(result => result.json())
-              .then(res => {     
-                let page  = {
-                  pageNumber: res.page,
-                  movies: res.results
-                };
-                pages.push(page);
-                this.setState({          
-                  totalPages: res.total_pages,          
-                  isLoaded: true,
-                  pages,
-                  activePage: page
-                });        
-              }, (error) => {
-                this.setState({
-                  isLoaded: false,
-                  error
-                });
-              });
-    }
-
-    destructSearchParams = (paramsString) => {
-        const params = new URLSearchParams(paramsString); 
+    const destructSearchParams = (paramsString) => {
+        const params = new URLSearchParams(paramsString);
         const querySearch = params.get('q');
-        this.setState({searchText: querySearch}, () => this.searchMovieApi(1));
+        setSearchMovieState({ searchValue: querySearch });
+        searchMovieApi(querySearch, 1);
     }
 
-    componentWillMount(){         
-        if(this.state.searchText == ""){
-            let paramsString = this.props.location.search;
-            if(paramsString !== ""){
-                this.destructSearchParams(paramsString);
-            }
+    const searchMovieApi = async (query, pageNumber) => {
+        try {
+            const data = await MovieDbApi.searchMovie(query, pageNumber);
+            let page = {
+                pageNumber: data.page,
+                movies: data.results
+            };
+            setSearchMovieState({
+                ...searchMovieState,
+                totalPages: data.total_pages,
+                isLoaded: true,
+                pages: [...(searchMovieState.pages || []), page],
+                activePage: page
+            });
+        } catch (error) {
+            setSearchMovieState({
+                ...searchMovieState,
+                isLoaded: false,
+                error
+            });
         }
     }
 
-    componentWillReceiveProps(nextProps){
-        if(nextProps.location != this.props.location){
-            let nextParamsString = nextProps.location.search;
-            let currentParamsString = this.props.location.search;
-            if(nextParamsString !== "" && nextParamsString != currentParamsString){
-                this.destructSearchParams(nextParamsString);
+
+    const renderSearchResult = (renderProps) => {
+        const { isLoaded, activePage, totalPages } = searchMovieState;
+        if (isLoaded && activePage) {
+            if (!activePage.movies.length) {
+                return <h1 style={{ color: "#ffffff" }}>No results</h1>
             }
+            return (
+                <MoviesList
+                    {...renderProps}
+                    page={activePage}
+                    totalPages={totalPages}
+                    genres={props.genres}
+                    getMovies={searchMovieApi} />
+            );
         }
+
+        return <LoadingSpinner />;
     }
 
-    render(){
-        const { isLoaded, activePage, totalPages } = this.state;        
-        return (
-            <Router>
-                <Switch>
-                    <Route exact path="/search/:id" component={MovieDetail} />
-                    <Route exact path="/search" render={props =>
-                    isLoaded && activePage !== null ?
-                    <MoviesList {...props} page={activePage} totalPages={totalPages} genres={this.props.genres} getMovies={this.searchMovieApi} />
-                    : <LoadingSpinner />
-                    } />
-                </Switch>        
-            </Router>
-        );
-    }
+    return (
+        <>
+            {searchMovieState.error && <Redirect to="/error-404" />}
+            <Switch>
+                <Route exact path="/search/:id" component={MovieDetails} />
+                <Route exact path="/search" render={renderSearchResult} />
+            </Switch>
+        </>
+    );
 
 
 }

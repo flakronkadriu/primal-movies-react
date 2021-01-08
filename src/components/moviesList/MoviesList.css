@@ -31,7 +31,9 @@ a:hover{
     margin-top: 10px;
     font-size: 14px;
     height: 40px;
-    text-align: left;    
+    text-align: left;
+    word-wrap: break-word;
+    word-break: keep-all;
 }
 .genres span:first-child{
     padding-left: 0;
